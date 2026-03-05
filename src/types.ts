@@ -8,6 +8,7 @@ export interface Användarerad extends Användare {
   losenord: string;
 }
 
+//recensionsobjekt
 export interface Recensionsrad {
   id: number;
   bokId: string;
@@ -18,6 +19,7 @@ export interface Recensionsrad {
   skapadDatum: string;
 }
 
+//jwt payload
 export interface JWTPayload {
   id: number;
   epost: string;

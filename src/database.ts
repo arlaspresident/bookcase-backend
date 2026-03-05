@@ -1,7 +1,8 @@
 import Database from 'better-sqlite3';
+import type { Database as DB } from 'better-sqlite3';
 import path from 'path';
 
-const db = new Database(path.join(__dirname, '..', 'bookbase.db'));
+const db: DB = new Database(path.join(__dirname, '..', 'bookbase.db'));
 
 //skapa tabeller om dom inte redan finns
 db.exec(`
