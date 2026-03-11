@@ -11,7 +11,7 @@ router.get('/mina', autentisera, (req: Request, res: Response) => {
   const användareId = req.användare!.id;
 
   const recensioner = db.prepare(`
-    SELECT r.id, r.bokId, r.användareId, u.namn as användarnamn, r.text, r.betyg, r.skapadDatum
+    SELECT r.id, r.bokId, r.bokTitel, r.användareId, u.namn as användarnamn, r.text, r.betyg, r.skapadDatum
     FROM recensioner r
     JOIN användare u ON r.användareId = u.id
     WHERE r.användareId = ?
@@ -26,7 +26,7 @@ router.get('/:bokId', (req: Request, res: Response) => {
   const { bokId } = req.params;
 
   const recensioner = db.prepare(`
-    SELECT r.id, r.bokId, r.användareId, u.namn as användarnamn, r.text, r.betyg, r.skapadDatum
+    SELECT r.id, r.bokId, r.bokTitel, r.användareId, u.namn as användarnamn, r.text, r.betyg, r.skapadDatum
     FROM recensioner r
     JOIN användare u ON r.användareId = u.id
     WHERE r.bokId = ?
@@ -38,29 +38,29 @@ router.get('/:bokId', (req: Request, res: Response) => {
 
 //skapa recension
 router.post('/', autentisera, (req: Request, res: Response) => {
-  const { bokId, text, betyg } = req.body as { bokId: string; text: string; betyg: number };
+  const { bokId, bokTitel, text, betyg } = req.body as { bokId: string; bokTitel: string; text: string; betyg: number };
   const användareId = req.användare!.id;
 
-  if (!bokId || !text || betyg === undefined) {
-    res.status(400).json({ fel: 'bokId, text och betyg krävs' });
+  if (!bokId || !bokTitel || !text || betyg === undefined) {
+    res.status(400).json({ meddelande: 'bokId, text och betyg krävs' });
     return;
   }
 
   if (betyg < 1 || betyg > 5) {
-    res.status(400).json({ fel: 'betyg måste vara mellan 1 och 5' });
+    res.status(400).json({ meddelande: 'betyg måste vara mellan 1 och 5' });
     return;
   }
 
   const befintlig = db.prepare('SELECT id FROM recensioner WHERE bokId = ? AND användareId = ?').get(bokId, användareId);
   if (befintlig) {
-    res.status(409).json({ fel: 'du har redan recenserat denna bok' });
+    res.status(409).json({ meddelande: 'du har redan recenserat denna bok' });
     return;
   }
 
-  const result = db.prepare('INSERT INTO recensioner (bokId, användareId, text, betyg) VALUES (?, ?, ?, ?)').run(bokId, användareId, text, betyg);
+  const result = db.prepare('INSERT INTO recensioner (bokId, bokTitel, användareId, text, betyg) VALUES (?, ?, ?, ?, ?)').run(bokId, bokTitel, användareId, text, betyg);
 
   const recension = db.prepare(`
-    SELECT r.id, r.bokId, r.användareId, u.namn as användarnamn, r.text, r.betyg, r.skapadDatum
+    SELECT r.id, r.bokId, r.bokTitel, r.användareId, u.namn as användarnamn, r.text, r.betyg, r.skapadDatum
     FROM recensioner r
     JOIN användare u ON r.användareId = u.id
     WHERE r.id = ?
@@ -76,24 +76,24 @@ router.put('/:id', autentisera, (req: Request, res: Response) => {
   const användareId = req.användare!.id;
 
   if (!text && betyg === undefined) {
-    res.status(400).json({ fel: 'text eller betyg krävs' });
+    res.status(400).json({ meddelande: 'text eller betyg krävs' });
     return;
   }
 
   if (betyg !== undefined && (betyg < 1 || betyg > 5)) {
-    res.status(400).json({ fel: 'betyg måste vara mellan 1 och 5' });
+    res.status(400).json({ meddelande: 'betyg måste vara mellan 1 och 5' });
     return;
   }
 
   const recension = db.prepare('SELECT * FROM recensioner WHERE id = ?').get(id) as Recensionsrad | undefined;
 
   if (!recension) {
-    res.status(404).json({ fel: 'recensionen hittades inte' });
+    res.status(404).json({ meddelande: 'recensionen hittades inte' });
     return;
   }
 
   if (recension.användareId !== användareId) {
-    res.status(403).json({ fel: 'du kan bara redigera dina egna recensioner' });
+    res.status(403).json({ meddelande: 'du kan bara redigera dina egna recensioner' });
     return;
   }
 
@@ -104,7 +104,7 @@ router.put('/:id', autentisera, (req: Request, res: Response) => {
   );
 
   const uppdaterad = db.prepare(`
-    SELECT r.id, r.bokId, r.användareId, u.namn as användarnamn, r.text, r.betyg, r.skapadDatum
+    SELECT r.id, r.bokId, r.bokTitel, r.användareId, u.namn as användarnamn, r.text, r.betyg, r.skapadDatum
     FROM recensioner r
     JOIN användare u ON r.användareId = u.id
     WHERE r.id = ?
@@ -121,12 +121,12 @@ router.delete('/:id', autentisera, (req: Request, res: Response) => {
   const recension = db.prepare('SELECT * FROM recensioner WHERE id = ?').get(id) as Recensionsrad | undefined;
 
   if (!recension) {
-    res.status(404).json({ fel: 'recensionen hittades inte' });
+    res.status(404).json({ meddelande: 'recensionen hittades inte' });
     return;
   }
 
   if (recension.användareId !== användareId) {
-    res.status(403).json({ fel: 'du kan bara ta bort dina egna recensioner' });
+    res.status(403).json({ meddelande: 'du kan bara ta bort dina egna recensioner' });
     return;
   }
 

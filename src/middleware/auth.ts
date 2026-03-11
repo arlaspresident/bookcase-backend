@@ -14,7 +14,7 @@ export const autentisera = (req: Request, res: Response, next: NextFunction): vo
   const authHeader = req.headers['authorization'];
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ fel: 'ingen token angiven' });
+    res.status(401).json({ meddelande: 'ingen token angiven' });
     return;
   }
 
@@ -25,6 +25,6 @@ export const autentisera = (req: Request, res: Response, next: NextFunction): vo
     req.användare = decoded;
     next();
   } catch {
-    res.status(401).json({ fel: 'ogiltig eller utgången token' });
+    res.status(401).json({ meddelande: 'ogiltig eller utgången token' });
   }
 };

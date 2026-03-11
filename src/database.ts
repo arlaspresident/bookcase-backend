@@ -17,6 +17,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS recensioner (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     bokId TEXT NOT NULL,
+    bokTitel TEXT NOT NULL DEFAULT '',
     användareId INTEGER NOT NULL,
     text TEXT NOT NULL,
     betyg INTEGER NOT NULL CHECK(betyg >= 1 AND betyg <= 5),
@@ -24,5 +25,12 @@ db.exec(`
     FOREIGN KEY (användareId) REFERENCES användare(id) ON DELETE CASCADE
   );
 `);
+
+//lägg till bok titel kolumn om de inte finns (migration för befintlig db)
+try {
+  db.exec(`ALTER TABLE recensioner ADD COLUMN bokTitel TEXT NOT NULL DEFAULT ''`);
+} catch {
+  //kolumnen finns redan inget att göra
+}
 
 export default db;

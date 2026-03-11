@@ -12,6 +12,7 @@ export interface Användarerad extends Användare {
 export interface Recensionsrad {
   id: number;
   bokId: string;
+  bokTitel: string;
   användareId: number;
   användarnamn: string;
   text: string;
