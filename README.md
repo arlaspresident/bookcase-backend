@@ -15,6 +15,8 @@ REST API för BookBase byggt med Express.js och SQLite.
 ### 1. Klona och installera
 
 ```bash
+git clone https://github.com/arlaspresident/bookcase-backend.git
+cd bookcase-backend
 npm install
 ```
 
@@ -44,6 +46,6 @@ Servern körs på `http://localhost:3001`
 - `POST /api/auth/logga-in` - logga in
 - `GET /api/recensioner/:bokId` - hämta recensioner för en bok
 - `GET /api/recensioner/mina` - hämta egna recensioner
-- `POST /api/recensioner` – skapa recension
-- `PUT /api/recensioner/:id` – uppdatera recension
-- `DELETE /api/recensioner/:id` – ta bort recension
+- `POST /api/recensioner` - skapa recension
+- `PUT /api/recensioner/:id` - uppdatera recension
+- `DELETE /api/recensioner/:id` - ta bort recension
